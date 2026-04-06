@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UserVault — User Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:    #0d0d0f;
+      --paper:  #f5f2eb;
+      --cream:  #ece8df;
+      --accent: #c84b2f;
+      --muted:  #7a7570;
+      --ok:     #2d6a4f;
+      --border: #d1ccc2;
+      --card:   #ffffff;
+      --mono:   'DM Mono', monospace;
+      --sans:   'Syne', sans-serif;
+      --radius: 4px;
+      --shadow: 0 2px 12px rgba(13,13,15,.08);
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    /* ── Header ── */
+    header {
+      border-bottom: 2px solid var(--ink);
+      padding: 1.2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .brand { font-size: 1.5rem; font-weight: 800; letter-spacing: -.03em; }
+    .brand span { color: var(--accent); }
+    .pill {
+      font-family: var(--mono);
+      font-size: .7rem;
+      letter-spacing: .1em;
+      padding: .3rem .8rem;
+      border: 1px solid var(--paper);
+      border-radius: 100px;
+      opacity: .6;
+    }
+
+    /* ── Layout ── */
+    main {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 0;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem;
+      gap: 2.5rem;
+      align-items: start;
+    }
+
+    /* ── Panel (form) ── */
+    .panel {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .panel-header {
+      background: var(--cream);
+      border-bottom: 1.5px solid var(--border);
+      padding: 1rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-title {
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .mode-badge {
+      font-family: var(--mono);
+      font-size: .65rem;
+      padding: .2rem .6rem;
+      border-radius: 100px;
+      background: var(--ink);
+      color: var(--paper);
+      letter-spacing: .06em;
+    }
+    .mode-badge.edit { background: var(--accent); }
+
+    form { padding: 1.4rem; display: flex; flex-direction: column; gap: .9rem; }
+
+    .field { display: flex; flex-direction: column; gap: .3rem; }
+    label {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    input {
+      font-family: var(--mono);
+      font-size: .85rem;
+      padding: .6rem .8rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--paper);
+      color: var(--ink);
+      outline: none;
+      transition: border-color .15s;
+      width: 100%;
+    }
+    input:focus { border-color: var(--ink); }
+    input.err { border-color: var(--accent); background: #fff5f3; }
+
+    .field-error {
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--accent);
+      display: none;
+    }
+    .field-error.show { display: block; }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+
+    .btn-row { display: flex; gap: .6rem; margin-top: .3rem; }
+    button {
+      font-family: var(--sans);
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      cursor: pointer;
+      border: none;
+      border-radius: var(--radius);
+      padding: .65rem 1.2rem;
+      transition: opacity .15s, transform .1s;
+    }
+    button:active { transform: scale(.97); }
+    .btn-primary { background: var(--ink); color: var(--paper); flex: 1; }
+    .btn-primary:hover { opacity: .85; }
+    .btn-cancel { background: var(--cream); color: var(--ink); border: 1.5px solid var(--border); }
+    .btn-cancel:hover { background: var(--border); }
+
+    /* ── Alert banner ── */
+    .alert {
+      margin: 0 1.4rem 1rem;
+      padding: .7rem 1rem;
+      border-radius: var(--radius);
+      font-family: var(--mono);
+      font-size: .75rem;
+      display: none;
+    }
+    .alert.show { display: block; }
+    .alert.error { background: #ffe5e0; border: 1px solid #f5c2b8; color: var(--accent); }
+    .alert.success { background: #d8f3e8; border: 1px solid #b2dfca; color: var(--ok); }
+
+    /* ── Table panel ── */
+    .table-panel {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .table-header {
+      background: var(--cream);
+      border-bottom: 1.5px solid var(--border);
+      padding: 1rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .user-count {
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--muted);
+    }
+    .refresh-btn {
+      font-family: var(--mono);
+      font-size: .7rem;
+      padding: .25rem .7rem;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: var(--radius);
+    }
+    .refresh-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { border-bottom: 1.5px solid var(--border); }
+    th {
+      font-family: var(--mono);
+      font-size: .65rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: .7rem 1rem;
+      text-align: left;
+      font-weight: 500;
+    }
+    td {
+      font-family: var(--mono);
+      font-size: .78rem;
+      padding: .75rem 1rem;
+      border-bottom: 1px solid var(--cream);
+      color: var(--ink);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--paper); }
+
+    .id-cell { color: var(--muted); font-size: .7rem; }
+    .actions { display: flex; gap: .4rem; }
+    .btn-edit, .btn-delete {
+      font-size: .65rem;
+      padding: .25rem .6rem;
+      border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      font-family: var(--mono);
+      background: transparent;
+    }
+    .btn-edit { color: var(--ink); }
+    .btn-edit:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .btn-delete { color: var(--accent); border-color: #f5c2b8; }
+    .btn-delete:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .8rem;
+    }
+    .empty-icon { font-size: 2.5rem; margin-bottom: .8rem; }
+
+    /* ── Loader ── */
+    .loader { display: none; text-align: center; padding: 2rem; color: var(--muted); font-family: var(--mono); font-size: .8rem; }
+    .loader.show { display: block; }
+
+    footer {
+      text-align: center;
+      padding: 1.2rem;
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 800px) {
+      main { grid-template-columns: 1fr; padding: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">User Management</div>
+  <div class="pill">CRUD MANAGER</div>
+</header>
+
+<main>
+  <!-- ── Form Panel ── -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Add User</span>
+      <span class="mode-badge" id="modeBadge">CREATE</span>
+    </div>
+
+    <div class="alert" id="formAlert"></div>
+
+    <form id="userForm" novalidate>
+      <input type="hidden" id="editingId" value="" />
+
+      <div class="row-2">
+        <div class="field">
+          <label for="first_name">First Name</label>
+          <input id="first_name" name="first_name" placeholder="Jane" />
+          <span class="field-error" id="err-first_name"></span>
+        </div>
+        <div class="field">
+          <label for="last_name">Last Name</label>
+          <input id="last_name" name="last_name" placeholder="Doe" />
+          <span class="field-error" id="err-last_name"></span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="username">Username</label>
+        <input id="username" name="username" placeholder="jane_doe" />
+        <span class="field-error" id="err-username"></span>
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="jane@example.com" />
+        <span class="field-error" id="err-email"></span>
+      </div>
+
+      <div class="field">
+        <label for="phone_number">Phone Number</label>
+        <input id="phone_number" name="phone_number" placeholder="5555555555 (optional)" />
+        <span class="field-error" id="err-phone_number"></span>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" placeholder="min. 8 characters" />
+        <span class="field-error" id="err-password"></span>
+      </div>
+
+      <div class="btn-row">
+        <button type="submit" class="btn-primary" id="submitBtn">Create User</button>
+        <button type="button" class="btn-cancel" id="cancelBtn" style="display:none">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ── Table Panel ── -->
+  <div class="table-panel">
+    <div class="table-header">
+      <span class="panel-title">All Users</span>
+      <div style="display:flex;align-items:center;gap:.8rem">
+        <span class="user-count" id="userCount">— users</span>
+        <button class="refresh-btn" onclick="loadUsers()">↺ Refresh</button>
+      </div>
+    </div>
+
+    <div class="loader" id="loader">Loading users…</div>
+
+    <div id="tableWrap">
+      <table id="userTable" style="display:none">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Since</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">🗃</div>
+        No users found. Create one on the left.
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>User Management &mdash; FastAPI + SQLAlchemy demo</footer>
+
+<script>
+  const API = '/users';
+  const fields = ['first_name','last_name','username','email','phone_number','password'];
+
+  /* ── Helpers ── */
+  function showAlert(msg, type = 'error') {
+    const el = document.getElementById('formAlert');
+    el.textContent = msg;
+    el.className = `alert show ${type}`;
+    setTimeout(() => el.className = 'alert', 4000);
+  }
+
+  function setFieldError(name, msg) {
+    const inp = document.getElementById(name);
+    const err = document.getElementById('err-' + name);
+    if (msg) { inp.classList.add('err'); err.textContent = msg; err.classList.add('show'); }
+    else { inp.classList.remove('err'); err.textContent = ''; err.classList.remove('show'); }
+  }
+
+  function clearErrors() { fields.forEach(f => setFieldError(f, '')); }
+
+  function getVal(id) { return document.getElementById(id).value.trim(); }
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric',
+    hour: 'numeric', minute: '2-digit', hour12: true });
+  }
+
+  /* ── Load users ── */
+  async function loadUsers() {
+    document.getElementById('loader').classList.add('show');
+    document.getElementById('userTable').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'none';
+    try {
+      const res = await fetch(API + '/');
+      if (!res.ok) throw new Error('Failed to load');
+      const users = await res.json();
+      renderTable(users);
+    } catch (e) {
+      document.getElementById('emptyState').textContent = '⚠ Could not load users.';
+      document.getElementById('emptyState').style.display = 'block';
+    }
+    document.getElementById('loader').classList.remove('show');
+  }
+
+  function renderTable(users) {
+    document.getElementById('userCount').textContent = `${users.length} user${users.length !== 1 ? 's' : ''}`;
+    const tbody = document.getElementById('tableBody');
+    if (!users.length) {
+      tbody.innerHTML = '';
+      document.getElementById('emptyState').style.display = 'block';
+      document.getElementById('userTable').style.display = 'none';
+      return;
+    }
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('userTable').style.display = 'table';
+    tbody.innerHTML = users.map(u => `
+      <tr>
+        <td class="id-cell">#${u.id}</td>
+        <td>${escHtml(u.first_name)} ${escHtml(u.last_name)}</td>
+        <td>${escHtml(u.username)}</td>
+        <td>${escHtml(u.email)}</td>
+        <td>${u.phone_number ? escHtml(u.phone_number) : '<span style="color:var(--muted)">—</span>'}</td>
+        <td>${formatDate(u.created_at)}</td>
+        <td>
+          <div class="actions">
+            <button class="btn-edit" onclick='editUser(${JSON.stringify(u)})'>Edit</button>
+            <button class="btn-delete" onclick="deleteUser(${u.id}, '${escHtml(u.username)}')">Delete</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── Create / Update ── */
+  document.getElementById('userForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    const id = document.getElementById('editingId').value;
+    const isEdit = !!id;
+
+    const payload = {};
+    if (!isEdit) {
+      payload.username    = getVal('username');
+      payload.email       = getVal('email');
+      payload.first_name  = getVal('first_name');
+      payload.last_name   = getVal('last_name');
+      payload.phone_number = getVal('phone_number') || null;
+      payload.password    = document.getElementById('password').value;
+    } else {
+      if (getVal('email'))       payload.email       = getVal('email');
+      if (getVal('first_name'))  payload.first_name  = getVal('first_name');
+      if (getVal('last_name'))   payload.last_name   = getVal('last_name');
+      payload.phone_number = getVal('phone_number') || null;
+      if (document.getElementById('password').value)
+        payload.password = document.getElementById('password').value;
+    }
+
+    try {
+      const res = await fetch(isEdit ? `${API}/${id}` : `${API}/`, {
+        method: isEdit ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        showAlert(isEdit ? 'User updated successfully!' : 'User created successfully!', 'success');
+        resetForm();
+        loadUsers();
+        return;
+      }
+
+      const data = await res.json();
+
+      // Pydantic validation errors (422)
+      if (res.status === 422 && data.detail) {
+        const errs = Array.isArray(data.detail) ? data.detail : [];
+        errs.forEach(err => {
+          const loc = err.loc || [];
+          const fieldName = loc[loc.length - 1];
+          if (fields.includes(fieldName)) setFieldError(fieldName, err.msg);
+        });
+        if (!errs.length) showAlert(JSON.stringify(data.detail));
+        return;
+      }
+
+      // 400 conflicts
+      if (res.status === 400) {
+        const msg = data.detail || 'Request error';
+        if (msg.toLowerCase().includes('username')) setFieldError('username', msg);
+        else if (msg.toLowerCase().includes('email')) setFieldError('email', msg);
+        else showAlert(msg);
+        return;
+      }
+
+      showAlert(data.detail || 'An unexpected error occurred.');
+    } catch (err) {
+      showAlert('Network error — is the server running?');
+    }
+  });
+
+  /* ── Edit ── */
+  function editUser(u) {
+    document.getElementById('editingId').value = u.id;
+    document.getElementById('first_name').value  = u.first_name;
+    document.getElementById('last_name').value   = u.last_name;
+    document.getElementById('username').value    = u.username;
+    document.getElementById('username').disabled = true;
+    document.getElementById('email').value       = u.email;
+    document.getElementById('phone_number').value = u.phone_number || '';
+    document.getElementById('password').value   = '';
+
+    document.querySelector('.panel-title').textContent = 'Edit User';
+    document.getElementById('modeBadge').textContent = 'EDIT';
+    document.getElementById('modeBadge').classList.add('edit');
+    document.getElementById('submitBtn').textContent = 'Save Changes';
+    document.getElementById('cancelBtn').style.display = 'block';
+    clearErrors();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── Delete ── */
+  async function deleteUser(id, name) {
+    if (!confirm(`Delete user "${name}"? This cannot be undone.`)) return;
+    try {
+      const res = await fetch(`${API}/${id}`, { method: 'DELETE' });
+      if (res.status === 204) {
+        showAlert(`User "${name}" deleted.`, 'success');
+        loadUsers();
+      } else {
+        const d = await res.json();
+        showAlert(d.detail || 'Delete failed.');
+      }
+    } catch { showAlert('Network error.'); }
+  }
+
+  /* ── Reset ── */
+  function resetForm() {
+    document.getElementById('editingId').value = '';
+    document.getElementById('userForm').reset();
+    document.getElementById('username').disabled = false;
+    document.querySelector('.panel-title').textContent = 'Add User';
+    document.getElementById('modeBadge').textContent = 'CREATE';
+    document.getElementById('modeBadge').classList.remove('edit');
+    document.getElementById('submitBtn').textContent = 'Create User';
+    document.getElementById('cancelBtn').style.display = 'none';
+    clearErrors();
+  }
+
+  document.getElementById('cancelBtn').addEventListener('click', resetForm);
+
+  loadUsers();
+</script>
+</body>
+</html>
