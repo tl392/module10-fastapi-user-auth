@@ -1,4 +1,4 @@
-# UserVault — FastAPI User Management
+# FastAPI User Management
 
 A secure user management API built with **FastAPI**, **SQLAlchemy**, **PostgreSQL**, and **bcrypt** password hashing. Includes a clean HTML UI, full CRUD operations, comprehensive tests, and a GitHub Actions CI/CD pipeline that deploys to Docker Hub.
 
@@ -197,16 +197,16 @@ Go to **Settings → Secrets and variables → Actions → New repository secret
 
 ## Docker Hub
 
-Docker image: **[https://hub.docker.com/r/\<your-username\>/uservault](https://hub.docker.com/r/ltaravindh392/uservault)**
+Docker image: **[https://hub.docker.com/r/ltaravindh392/fastapi-user-auth](https://hub.docker.com/r/ltaravindh392/fastapi-user-auth)**
 
 ```bash
 # Pull and run the latest image (requires an external Postgres)
-docker pull ltaravindh392/uservault:latest
+docker pull ltaravindh392/fastapi-user-auth:latest
 
 docker run -d \
   -p 8000:8000 \
   -e DATABASE_URL="postgresql://postgres:postgres@host.docker.internal:5432/userdb" \
-  ltaravindh392/uservault:latest
+  ltaravindh392/fastapi-user-auth:latest
 ```
 
 ---
