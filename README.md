@@ -54,7 +54,7 @@ fastapi-project/
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/<your-username>/fastapi-project.git
+git clone https://github.com/tl392/module10-fastapi-user-auth.git
 cd fastapi-project
 
 # 2. Start Postgres + app
@@ -73,12 +73,12 @@ open http://localhost:8000/docs
 
 ```bash
 # 1. Clone and enter the project
-git clone https://github.com/<your-username>/fastapi-project.git
+git clone https://github.com/tl392/module10-fastapi-user-auth.git
 cd fastapi-project
 
 # 2. Create and activate a virtual environment
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+python -m venv venv
+source venv/bin/activate        # Windows: .venv\Scripts\activate
 
 # 3. Install dependencies
 pip install -r requirements.txt
@@ -159,7 +159,6 @@ tests/test_integration.py::TestDeleteUser::test_delete_existing   PASSED
 | `PUT`    | `/users/{id}`  | Update user fields       |
 | `DELETE` | `/users/{id}`  | Delete a user            |
 | `GET`    | `/docs`        | Swagger UI               |
-| `GET`    | `/redoc`       | ReDoc                    |
 
 ### Example — Create a user
 
@@ -171,7 +170,7 @@ curl -X POST http://localhost:8000/users/ \
     "email": "jane@example.com",
     "first_name": "Jane",
     "last_name": "Doe",
-    "phone_number": "+1-555-0100",
+    "phone_number": "5555555555",
     "password": "securepass"
   }'
 ```
@@ -198,16 +197,16 @@ Go to **Settings → Secrets and variables → Actions → New repository secret
 
 ## Docker Hub
 
-Docker image: **[https://hub.docker.com/r/\<your-username\>/uservault](https://hub.docker.com/r/<your-username>/uservault)**
+Docker image: **[https://hub.docker.com/r/\<your-username\>/uservault](https://hub.docker.com/r/ltaravindh392/uservault)**
 
 ```bash
 # Pull and run the latest image (requires an external Postgres)
-docker pull <your-username>/uservault:latest
+docker pull ltaravindh392/uservault:latest
 
 docker run -d \
   -p 8000:8000 \
   -e DATABASE_URL="postgresql://postgres:postgres@host.docker.internal:5432/userdb" \
-  <your-username>/uservault:latest
+  ltaravindh392/uservault:latest
 ```
 
 ---
