@@ -17,6 +17,20 @@ A secure user management API built with **FastAPI**, **SQLAlchemy**, **PostgreSQ
 
 ---
 
+## Screenshot of output
+
+![alt text](output/image.png)
+![alt text](output/image2.png)
+![alt text](output/image-1.png)
+![alt text](image-2.png)
+![alt text](image-3.png)
+![alt text](image-4.png)
+![alt text](image-5.png)
+![alt text](image-6.png)
+![alt text](image-7.png)
+
+---
+
 ## Project Structure
 
 ```
@@ -78,7 +92,7 @@ cd fastapi-project
 
 # 2. Create and activate a virtual environment
 python -m venv venv
-source venv/bin/activate        # Windows: .venv\Scripts\activate
+source venv/bin/activate        # Windows: venv\Scripts\activate
 
 # 3. Install dependencies
 pip install -r requirements.txt
@@ -112,7 +126,7 @@ open http://localhost:8000
 
 ```bash
 # Activate your virtualenv first
-source .venv/bin/activate
+source venv/bin/activate
 
 pytest tests/test_unit.py -v
 ```

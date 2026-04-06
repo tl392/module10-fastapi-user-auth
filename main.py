@@ -37,7 +37,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="UserVault API",
+    title="User Management API",
     description="Secure user management with FastAPI, SQLAlchemy, and bcrypt",
     version="1.0.0",
     lifespan=lifespan,
