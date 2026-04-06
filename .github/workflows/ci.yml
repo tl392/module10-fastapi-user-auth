@@ -67,5 +67,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/uservault:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/uservault:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-user-auth:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-user-auth:${{ github.sha }}
