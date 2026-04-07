@@ -28,6 +28,7 @@ A secure user management API built with **FastAPI**, **SQLAlchemy**, **PostgreSQ
 ![alt text](output/image-5.png)
 ![alt text](output/image-6.png)
 ![alt text](output/image-7.png)
+![alt text](output/image-10.png)
 
 ---
 
