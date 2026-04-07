@@ -228,16 +228,12 @@ docker run -d \
 
 ## Reflection
 
-### Key Experiences
+This project helped me gain hands-on experience building a secure user system using FastAPI, SQLAlchemy, and PostgreSQL. I learned how to design a proper user model with unique constraints for username and email, and how to safely store passwords using hashing instead of plain text.
 
-Building this project reinforced how naturally FastAPI, SQLAlchemy, and Pydantic compose together. The separation of concerns — models, schemas, CRUD, routes — kept the codebase clean and made testing straightforward. Pydantic v2's `field_validator` and `model_config = {"from_attributes": True}` required small adjustments compared to v1, but the resulting schema layer is expressive and easy to reason about.
+One of the main challenges I faced was implementing password hashing. I ran into a compatibility issue between bcrypt and passlib, which caused errors during testing. Debugging this issue helped me understand the importance of dependency management and version compatibility, especially when working with security-related libraries.
 
-### Challenges
+Writing tests was another important part of this project. I created both unit tests and integration tests. Unit tests helped verify smaller pieces like password hashing and schema validation, while integration tests ensured that the API endpoints worked correctly with the database. Setting up the test database and ensuring data isolation between tests required careful setup.
 
-**Password hashing in tests** — Ensuring `password_hash` never leaks through `UserRead` required explicit checks in both the schema unit tests and the integration tests. The `model_dump()` assertion gives a clear safety net.
+I also gained experience working with Docker to run PostgreSQL and the FastAPI application together. This made it easier to maintain a consistent development environment and test the application reliably.
 
-**Test isolation** — Integration tests share a database, so the `clean_tables` fixture (truncating between tests) was essential to prevent false failures from leftover rows.
-
-**CI service containers** — GitHub Actions' Postgres service container needs the `pg_isready` health check; without it, tests start before the database is ready and fail intermittently.
-
-**Pydantic email validation** — `EmailStr` requires the `pydantic[email]` extra (which pulls in `email-validator`). Forgetting this extra produces a confusing import error at runtime.
+Overall, this project improved my understanding of backend development, database interactions, and secure coding practices. It also gave me confidence in building and testing API-based applications, which I will continue to expand on in future projects.
